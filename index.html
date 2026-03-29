@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELAVELA</title>
+    <meta name="description" content="Algo se viene. No le cuentes a nadie.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://velavela.capital">
+    <meta property="og:title" content="VELAVELA">
+    <meta property="og:description" content="Algo se viene. No le cuentes a nadie.">
+    <meta property="og:image" content="https://velavela.capital/og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="VELAVELA">
+    <meta name="twitter:description" content="Algo se viene. No le cuentes a nadie.">
+    <meta name="twitter:image" content="https://velavela.capital/og.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #050505;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Candlestick canvas */
+        .candles-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        /* Subtle gradient overlay */
+        .gradient-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: radial-gradient(ellipse at 50% 40%, transparent 0%, #050505 85%);
+        }
+
+        /* Content */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        .emoji {
+            font-size: clamp(100px, 22vw, 180px);
+            line-height: 1;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+            user-select: none;
+            will-change: transform;
+            transition: filter 0.4s;
+            margin-bottom: 32px;
+        }
+
+        .emoji:hover {
+            filter: drop-shadow(0 0 80px rgba(255,255,255,0.15));
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .logo {
+            font-size: clamp(48px, 12vw, 140px);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            animation: fadeUp 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+            color: #fff;
+        }
+
+        .tagline {
+            font-size: clamp(12px, 1.8vw, 15px);
+            font-weight: 400;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+            margin-top: 20px;
+            animation: fadeUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .countdown {
+            font-size: clamp(11px, 1.4vw, 14px);
+            font-weight: 500;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.5em;
+            font-variant-numeric: tabular-nums;
+            margin-top: 16px;
+            animation: fadeUp 0.8s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Email signup */
+        .signup {
+            margin-top: 40px;
+            animation: fadeUp 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            display: flex;
+            gap: 0;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 100px;
+            overflow: hidden;
+            transition: border-color 0.4s, box-shadow 0.4s;
+            backdrop-filter: blur(20px);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .signup:focus-within {
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 0 40px rgba(255,255,255,0.03);
+        }
+
+        .signup input {
+            background: transparent;
+            border: none;
+            padding: 16px 28px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            outline: none;
+            width: 280px;
+        }
+
+        .signup input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+
+        .signup button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 16px 32px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .signup button:hover {
+            background: #e0e0e0;
+        }
+
+        .signup.success { border-color: rgba(255,255,255,0.2); }
+        .signup.success button { background: #fff; }
+
+        /* Bottom */
+        .bottom {
+            position: fixed;
+            bottom: 28px;
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 0.4em;
+            color: rgba(255,255,255,0.25);
+            text-transform: uppercase;
+            animation: fadeUp 0.8s 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @media (max-width: 600px) {
+            .signup { flex-direction: column; border-radius: 16px; }
+            .signup input { width: 100%; text-align: center; padding: 16px 20px; }
+            .signup button { width: 100%; padding: 16px 20px; }
+            .content { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="candles" class="candles-bg"></canvas>
+    <div class="gradient-overlay"></div>
+
+    <div class="content">
+        <div class="emoji">🤫</div>
+        <div class="logo">VELAVELA</div>
+        <div class="tagline">Algo se viene</div>
+        <div class="countdown" id="countdown"></div>
+        <form class="signup" id="signup" onsubmit="handleSubmit(event)">
+            <input type="email" placeholder="tu email para enterarte primero" required>
+            <button type="submit">ENTRAR</button>
+        </form>
+    </div>
+
+    <div class="bottom">No le cuentes a nadie</div>
+
+    <script>
+        // Candlestick background
+        (function() {
+            const canvas = document.getElementById('candles');
+            const ctx = canvas.getContext('2d');
+            let W, H;
+
+            function resize() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const NUM = 30;
+            const candles = [];
+
+            function randRange(a, b) { return a + Math.random() * (b - a); }
+
+            function createCandle(i) {
+                const bullish = Math.random() > 0.45;
+                const bodyH = randRange(30, 100);
+                const wickTop = randRange(8, 40);
+                const wickBot = randRange(8, 40);
+                const totalH = bodyH + wickTop + wickBot;
+                return {
+                    x: (W / NUM) * i + randRange(-8, 8),
+                    y: H + randRange(0, 200),
+                    bodyH,
+                    bodyW: randRange(6, 14),
+                    wickTop,
+                    wickBot,
+                    totalH,
+                    speed: randRange(0.12, 0.35),
+                    bullish,
+                    opacity: randRange(0.10, 0.22),
+                    drift: randRange(-0.05, 0.05),
+                };
+            }
+
+            for (let i = 0; i < NUM; i++) {
+                const c = createCandle(i);
+                c.y = randRange(-c.totalH, H + 100);
+                candles.push(c);
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+
+                for (let i = 0; i < candles.length; i++) {
+                    const c = candles[i];
+                    c.y -= c.speed;
+                    c.x += c.drift;
+
+                    if (c.y + c.totalH < -50) {
+                        candles[i] = createCandle(i);
+                    }
+
+                    const green = `rgba(100, 220, 160, ${c.opacity})`;
+                    const red = `rgba(220, 80, 80, ${c.opacity})`;
+                    const color = c.bullish ? green : red;
+                    const wickAlpha = c.opacity * 0.6;
+                    const wickColor = c.bullish
+                        ? `rgba(100, 220, 160, ${wickAlpha})`
+                        : `rgba(220, 80, 80, ${wickAlpha})`;
+
+                    const cx = c.x + c.bodyW / 2;
+                    const bodyTop = c.y + c.wickTop;
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, c.y);
+                    ctx.lineTo(cx, bodyTop);
+                    ctx.strokeStyle = wickColor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    ctx.fillStyle = color;
+                    ctx.fillRect(c.x, bodyTop, c.bodyW, c.bodyH);
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, bodyTop + c.bodyH);
+                    ctx.lineTo(cx, bodyTop + c.bodyH + c.wickBot);
+                    ctx.strokeStyle = wickColor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+            draw();
+        })();
+
+        // Countdown
+        function updateCountdown() {
+            const target = new Date('2026-04-15T00:00:00-03:00');
+            const now = new Date();
+            const diff = target - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').textContent = 'YA ARRANCAMOS';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').textContent =
+                `${days}D  ${String(hours).padStart(2,'0')}H  ${String(mins).padStart(2,'0')}M  ${String(secs).padStart(2,'0')}S`;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Form
+        function handleSubmit(e) {
+            e.preventDefault();
+            const form = document.getElementById('signup');
+            const btn = form.querySelector('button');
+            const input = form.querySelector('input');
+
+            btn.textContent = '🤫';
+            form.classList.add('success');
+            input.disabled = true;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.textContent = 'PRONTO';
+            }, 800);
+        }
+
+        // Emoji follows mouse
+        const emoji = document.querySelector('.emoji');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let emojiX = 0;
+        let emojiY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateEmoji() {
+            const dx = (mouseX - window.innerWidth / 2) * 0.05;
+            const dy = (mouseY - window.innerHeight / 2) * 0.05;
+
+            emojiX += (dx - emojiX) * 0.06;
+            emojiY += (dy - emojiY) * 0.06;
+
+            emoji.style.transform = `translate(${emojiX}px, ${emojiY}px)`;
+            requestAnimationFrame(animateEmoji);
+        }
+        animateEmoji();
+    </script>
+</body>
+</html>
