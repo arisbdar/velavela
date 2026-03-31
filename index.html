@@ -327,21 +327,39 @@
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // Form
+        // Form — sends email to Google Sheet via Apps Script
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwr5S2lHfBy3TtNl6b905QPlitIgo8HiV9xjY8njIsXipEMLjffWt4bij-eJ_MCDIms/exec';
+
         function handleSubmit(e) {
             e.preventDefault();
             const form = document.getElementById('signup');
             const btn = form.querySelector('button');
             const input = form.querySelector('input');
+            const email = input.value.trim();
 
-            btn.textContent = '🤫';
-            form.classList.add('success');
-            input.disabled = true;
+            if (!email) return;
+
+            btn.textContent = '...';
             btn.disabled = true;
+            input.disabled = true;
 
-            setTimeout(() => {
-                btn.textContent = 'PRONTO';
-            }, 800);
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            })
+            .then(() => {
+                btn.textContent = '🤫';
+                form.classList.add('success');
+                setTimeout(() => { btn.textContent = 'LISTO'; }, 800);
+            })
+            .catch(() => {
+                btn.textContent = 'ERROR';
+                btn.disabled = false;
+                input.disabled = false;
+                setTimeout(() => { btn.textContent = 'ENTRAR'; }, 2000);
+            });
         }
 
         // Emoji follows mouse
