@@ -328,13 +328,15 @@
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // Form — sends email to Google Sheet via hidden form POST
+        // Form — sends email to Google Sheet via image GET request (bypasses CORS)
+        var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBtDIKsqoUTudWL-LT9SqFfb8NrDp4Rcni_bti4VYwPDAko6G-tjkffNwVWjzNFuBI/exec';
+
         function handleSubmit(e) {
             e.preventDefault();
-            const form = document.getElementById('signup');
-            const btn = form.querySelector('button');
-            const input = form.querySelector('input[name="email"]');
-            const email = input.value.trim();
+            var form = document.getElementById('signup');
+            var btn = form.querySelector('button');
+            var input = form.querySelector('input[name="email"]');
+            var email = input.value.trim();
 
             if (!email) return;
 
@@ -342,25 +344,14 @@
             btn.disabled = true;
             input.disabled = true;
 
-            // Create a temporary form that submits to the hidden iframe
-            var tempForm = document.createElement('form');
-            tempForm.method = 'POST';
-            tempForm.action = 'https://script.google.com/macros/s/AKfycbyBtDIKsqoUTudWL-LT9SqFfb8NrDp4Rcni_bti4VYwPDAko6G-tjkffNwVWjzNFuBI/exec';
-            tempForm.target = 'hidden_iframe';
-            tempForm.style.display = 'none';
-
-            var emailField = document.createElement('input');
-            emailField.name = 'email';
-            emailField.value = email;
-            tempForm.appendChild(emailField);
-
-            document.body.appendChild(tempForm);
-            tempForm.submit();
-            document.body.removeChild(tempForm);
-
-            btn.textContent = '🤫';
-            form.classList.add('success');
-            setTimeout(() => { btn.textContent = 'LISTO'; }, 800);
+            // Use image beacon — guaranteed to bypass CORS
+            var img = new Image();
+            img.onload = img.onerror = function() {
+                btn.textContent = '🤫';
+                form.classList.add('success');
+                setTimeout(function() { btn.textContent = 'LISTO'; }, 800);
+            };
+            img.src = SCRIPT_URL + '?email=' + encodeURIComponent(email);
         }
 
         // Emoji follows mouse
