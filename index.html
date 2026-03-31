@@ -204,9 +204,10 @@
         <div class="tagline">Algo se viene</div>
         <div class="countdown" id="countdown"></div>
         <form class="signup" id="signup" onsubmit="handleSubmit(event)">
-            <input type="email" placeholder="tu email para enterarte primero" required>
+            <input type="email" name="email" placeholder="tu email para enterarte primero" required>
             <button type="submit">ENTRAR</button>
         </form>
+        <iframe name="hidden_iframe" style="display:none;"></iframe>
     </div>
 
     <div class="bottom">No le cuentes a nadie</div>
@@ -327,14 +328,12 @@
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // Form — sends email to Google Sheet via Apps Script
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBtDIKsqoUTudWL-LT9SqFfb8NrDp4Rcni_bti4VYwPDAko6G-tjkffNwVWjzNFuBI/exec';
-
+        // Form — sends email to Google Sheet via hidden form POST
         function handleSubmit(e) {
             e.preventDefault();
             const form = document.getElementById('signup');
             const btn = form.querySelector('button');
-            const input = form.querySelector('input');
+            const input = form.querySelector('input[name="email"]');
             const email = input.value.trim();
 
             if (!email) return;
@@ -343,22 +342,25 @@
             btn.disabled = true;
             input.disabled = true;
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: new URLSearchParams({ email: email })
-            })
-            .then(() => {
-                btn.textContent = '🤫';
-                form.classList.add('success');
-                setTimeout(() => { btn.textContent = 'LISTO'; }, 800);
-            })
-            .catch(() => {
-                btn.textContent = 'ERROR';
-                btn.disabled = false;
-                input.disabled = false;
-                setTimeout(() => { btn.textContent = 'ENTRAR'; }, 2000);
-            });
+            // Create a temporary form that submits to the hidden iframe
+            var tempForm = document.createElement('form');
+            tempForm.method = 'POST';
+            tempForm.action = 'https://script.google.com/macros/s/AKfycbyBtDIKsqoUTudWL-LT9SqFfb8NrDp4Rcni_bti4VYwPDAko6G-tjkffNwVWjzNFuBI/exec';
+            tempForm.target = 'hidden_iframe';
+            tempForm.style.display = 'none';
+
+            var emailField = document.createElement('input');
+            emailField.name = 'email';
+            emailField.value = email;
+            tempForm.appendChild(emailField);
+
+            document.body.appendChild(tempForm);
+            tempForm.submit();
+            document.body.removeChild(tempForm);
+
+            btn.textContent = '🤫';
+            form.classList.add('success');
+            setTimeout(() => { btn.textContent = 'LISTO'; }, 800);
         }
 
         // Emoji follows mouse
